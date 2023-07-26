@@ -13,7 +13,31 @@ function getProducts() {
     console.log(rows);
   });
 }
-getProducts();
+// getProducts();
+
+function insertProduct() {
+  const query =
+    "INSERT INTO products (title, description, imageUrl, price) VALUES (?, ?, ?, ?)";
+  const values = [
+    "Shoe",
+    "This is an awesome shoe!..",
+    "url2", 1999,
+  ];
+  db.execute(query, values).then((result) => {
+    console.log(result);
+  });
+}
+// insertProduct();
+
+function deleteProducts(id) {
+    const query =
+      "DELETE FROM products WHERE products.id = ?";
+    const values = [2];
+    db.execute(query, values).then(([row, fileData]) => {
+      console.log(row);
+    }).catch((err) => console.log(err));
+  }
+  deleteProducts();
 
 app.set("view engine", "ejs");
 app.set("views", "views");
