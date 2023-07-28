@@ -1,66 +1,39 @@
-const path = require("path");
+const path = require('path');
 
-const express = require("express");
-const bodyParser = require("body-parser");
-const sequelize = require("./util/database");
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const errorController = require("./controllers/error");
+const errorController = require('./controllers/error');
+const sequelize = require('./util/database');
+
+const Product = require('./models/product');
+const User = require('./models/user');
 
 const app = express();
 
-// function getProducts() {
-//   db.execute("SELECT * FROM products").then(([rows, fileData]) => {
-//     console.log(rows);
-//   });
-// }
-// getProducts();
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
-// function insertProduct() {
-//   const query =
-//     "INSERT INTO products (title, description, imageUrl, price) VALUES (?, ?, ?, ?)";
-//   const values = [
-//     "Shoe",
-//     "This is an awesome shoe!..",
-//     "url2", 1999,
-//   ];
-//   db.execute(query, values).then((result) => {
-//     console.log(result);
-//   });
-// }
-// insertProduct();
-
-// function deleteProducts(id) {
-//     const query =
-//       "DELETE FROM products WHERE products.id = ?";
-//     const values = [2];
-//     db.execute(query, values).then(([row, fileData]) => {
-//       console.log(row);
-//     }).catch((err) => console.log(err));
-//   }
-//   deleteProducts();
-
-app.set("view engine", "ejs");
-app.set("views", "views");
-
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use("/admin", adminRoutes);
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
 
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Product);
+
 sequelize
-  .sync()
-  .then((result) => {
-    console.log(result);
+  .sync({ force: true })
+  .then(result => {
+    // console.log(result);
     app.listen(3000);
   })
-  .catch((err) => {
+  .catch(err => {
     console.log(err);
   });
-
-app.listen(3000);
